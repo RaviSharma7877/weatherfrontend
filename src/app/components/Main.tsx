@@ -1,11 +1,29 @@
 "use client"
-import React, { useState } from 'react';
+import React, { Key, useState } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { Cloud, CloudRain, Moon, Sun } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+interface WeatherData {
+  location: any;
+  forecast?: {
+    items?: {
+      weather: any;
+      temperature: any;
+      date: string; // Assuming date is a string, update to appropriate type if needed
+      astronomy?: {
+        sunrise?: string;
+        sunset?: string;
+      };
+    }[];
+  };
+  // Add other properties as needed
+}
+
+// Define the type of weatherData as WeatherData
 
 const Main = () => {
-  const [weatherData, setWeatherData] = useState(null);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+
   const [searchCity, setSearchCity] = useState("");
 
   const fetchWeatherData = async () => {
@@ -22,12 +40,12 @@ const Main = () => {
     }
   };
 
-  const sunriseTime = weatherData?.forecast?.items[0]?.astronomy?.sunrise;
+  const sunriseTime = weatherData?.forecast?.items?.[0]?.astronomy?.sunrise;
   const formattedSunriseTime = sunriseTime ? new Date(sunriseTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
-
-  const sunsetTime = weatherData?.forecast?.items[0]?.astronomy?.sunset;
+  
+  const sunsetTime = weatherData?.forecast?.items?.[0]?.astronomy?.sunset;
   const formattedSunsetTime = sunsetTime ? new Date(sunsetTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
-
+  
   const videos = {
     v1: 'foggy.mp4',
     v2: 'strom.mp4',
@@ -72,23 +90,28 @@ const Main = () => {
           <div className='relative w-70'>
             
             <div className='text'>
-              <div className='flex items-center text-4xl'>
-                {getWeatherIconByCondition(weatherData.forecast.items[0].weather.text.toLowerCase())}
-                <h2 className="font-semibold px-2">{weatherData.location.name}</h2>
-                <p>{weatherData.forecast.items[0].temperature.max}°C</p>
-              </div>
-              <div className='text-xs flex'>
-                <p className='bg-slate-50 rounded m-1 p-1'>Lat: {weatherData.location.coordinates.latitude}</p>
-                <p className='bg-slate-50 rounded m-1 p-1'>Long: {weatherData.location.coordinates.longitude}</p>
-              </div>
-              <div className='flex w-full flex-wrap'>
-                {weatherData.forecast.items.slice(-4).reverse().map((item) => (
-                  <p className='border p-1 rounded-xl flex m-1 bg-slate-50 items-center' key={item.date}>
-                    {getWeatherIconByCondition(item.weather.text.toLowerCase())}
-                    {item.date}
-                  </p>
-                ))}
-              </div>
+            <div className='flex items-center text-4xl'>
+  {weatherData?.forecast?.items?.[0] && (
+    <>
+      {getWeatherIconByCondition(weatherData.forecast.items[0].weather.text.toLowerCase())}
+      <h2 className="font-semibold px-2">{weatherData.location.name}</h2>
+      <p>{weatherData.forecast.items[0].temperature.max}°C</p>
+    </>
+  )}
+</div>
+<div className='text-xs flex'>
+  <p className='bg-slate-50 rounded m-1 p-1'>Lat: {weatherData?.location?.coordinates?.latitude}</p>
+  <p className='bg-slate-50 rounded m-1 p-1'>Long: {weatherData?.location?.coordinates?.longitude}</p>
+</div>
+<div className='flex w-full flex-wrap'>
+  {weatherData?.forecast?.items?.slice(-4).reverse().map((item) => (
+    <p className='border p-1 rounded-xl flex m-1 bg-slate-50 items-center' key={item.date}>
+      {getWeatherIconByCondition(item.weather.text.toLowerCase())}
+      {item.date}
+    </p>
+  ))}
+</div>
+
               <div className='flex w-full'>
                 <p className='border p-1 rounded-xl flex m-1 bg-slate-50 items-center'><Sun /> {formattedSunriseTime}</p>
                 <p className='border p-1 rounded-xl flex m-1 bg-slate-50 items-center'><Moon /> {formattedSunsetTime}</p>
