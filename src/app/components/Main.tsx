@@ -35,7 +35,7 @@ const Main = () => {
       const data = await response.json();
       setWeatherData(data);
     } catch (error: any) {
-        alert("CORS policy error")
+      alert("CORS policy error")
       console.log('Error fetching weather data:', error.message);
     }
   };
